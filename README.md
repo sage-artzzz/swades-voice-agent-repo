@@ -75,11 +75,28 @@ LIVEKIT_URL=wss://your-project.livekit.cloud
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 ```
 
-### 2. Run
+### 2. Run with Make
 
 ```bash
-docker compose up --build
+make up                              # start on default ports (3000 / 8000)
+make up FRONTEND_PORT=4000           # custom frontend port
+make up FRONTEND_PORT=4000 BACKEND_PORT=9000  # custom both ports
 ```
+
+| Command | Description |
+|---|---|
+| `make up` | Build and start all services |
+| `make down` | Stop all services |
+| `make restart` | Stop, rebuild, and start |
+| `make logs` | Follow logs from all services |
+| `make logs-api` | API logs only |
+| `make logs-agent` | Agent logs only |
+| `make logs-frontend` | Frontend logs only |
+| `make status` | Show container status |
+| `make clean` | Stop and wipe the database volume |
+| `make help` | Show all commands and current config |
+
+Once running:
 
 | URL | Description |
 |---|---|
@@ -149,7 +166,9 @@ swades-voice-agent/
 │       ├── AgentStatePanel.tsx     # State badge, collected data, interrupt count
 │       ├── LiveTranscript.tsx      # Real-time chat-style transcript
 │       └── TakeOverButton.tsx
-└── docker-compose.yml
+├── docker-compose.yml
+├── Makefile               # Docker shortcuts with configurable ports
+└── .env.example
 ```
 
 ## REST API
