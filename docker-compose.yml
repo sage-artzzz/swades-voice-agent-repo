@@ -1,0 +1,48 @@
+services:
+  api:
+    build:
+      context: ./backend
+    command: uvicorn server:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - db_data:/app/data
+    environment:
+      - DB_PATH=/app/data/appointments.db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agent:
+    build:
+      context: ./backend
+    command: python agent.py start
+    env_file:
+      - ./backend/.env
+    volumes:
+      - db_data:/app/data
+    environment:
+      - DB_PATH=/app/data/appointments.db
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://api:8000
+    depends_on:
+      - api
+
+volumes:
+  db_data:
